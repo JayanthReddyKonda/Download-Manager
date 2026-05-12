@@ -13,4 +13,8 @@ class DownloadTask:
         self.status = "completed"
         print(f"Finished downloading {self.filename}")
 
-    
+    def is_completed(self):
+        if(self.status=="completed"):
+            return True
+        else:
+            return False
