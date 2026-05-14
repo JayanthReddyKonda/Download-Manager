@@ -1,6 +1,8 @@
 import threading
 import time
 
+from task import RepeatingDownload
+
 class WorkerThread(threading.Thread):
 
     def __init__(self, queue, worker_name):
@@ -11,16 +13,23 @@ class WorkerThread(threading.Thread):
     def run(self):
         while True:
             task = self.queue.get()
-            print(f"[{self.worker_name}] Processing {task.filename}")
-            if (task.is_completed()):
+            if task is None:
                 self.queue.task_done()
-                print(f"Already Finished downloading {task.filename}")
-                continue
-            task.execute()
-            self.queue.task_done()
-            if(task.is_completed()==False):
-                print(f"[{self.worker_name}] Process not Completed,Reinserting-{task.filename}")
-                self.queue.put(task)
-
-                
-            
+                break
+            print(f"[{self.worker_name}] Processing {task.filename}")
+            try:
+                task.execute()
+            except RepeatingDownload as e:
+                print(e)
+            except Exception as e:
+                print(e)
+                if(task.is_completed()==False):
+                    if(task.retry_count>task.max_retries):
+                        print(f"{task.filename} Flie Cannot Be Downloaded,Max Retries Completed")
+                    else:
+                        print(f"[{self.worker_name}] Process not Completed,Reinserting-{task.filename}")
+                        task.retry_count += 1
+                        self.queue.put(task)
+            finally:
+                self.queue.task_done()
+        print(f"[{self.worker_name}] Stopped Gracefully")

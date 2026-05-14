@@ -1,9 +1,10 @@
 from queue import Queue
+from task import DownloadTask
 from worker import WorkerThread
 
 class DownloadManager:
 
-    def __init__(self, num_workers):
+    def __init__(self, num_workers=5):
 
         # Shared task queue
         self.queue = Queue()
@@ -22,6 +23,10 @@ class DownloadManager:
 
         for worker in self.workers:
             worker.start()
+
+    def stop_workers(self):
+        for _ in range(len(self.workers)):
+            self.queue.put(None)
 
     def add_task(self, task):
 

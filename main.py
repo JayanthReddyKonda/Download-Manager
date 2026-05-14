@@ -32,6 +32,7 @@ def main():
 
     # Wait until all tasks completed
     manager.wait_for_completion()
+    manager.stop_workers()
 
     print("\nAll downloads completed")
 
