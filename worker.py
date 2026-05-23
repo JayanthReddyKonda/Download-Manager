@@ -22,12 +22,12 @@ class WorkerThread(threading.Thread):
             except RepeatingDownload as e:
                 print(e)
             except Exception as e:
-                print(e)
+                print(f"[{self.worker_name}] Error: {e}")
                 if(task.is_completed()==False):
                     if(task.retry_count>task.max_retries):
-                        print(f"{task.filename} Flie Cannot Be Downloaded,Max Retries Completed")
+                        print(f"[{self.worker_name}] {task.filename} File Cannot Be Downloaded, Max Retries Completed")
                     else:
-                        print(f"[{self.worker_name}] Process not Completed,Reinserting-{task.filename}")
+                        print(f"[{self.worker_name}] Process not Completed, Reinserting: {task.filename}")
                         task.retry_count += 1
                         self.queue.put(task)
             finally:
